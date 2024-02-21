@@ -61,14 +61,14 @@ app.put('/todo/:id', async(req, res) => {
 })
 
 //delete a todo
-app.delete('/todo/:id', async(req, res)=>{
+app.delete('/todo/:id', async(req, res) =>{
     try {
-        const {id}=req.params;
-        const todo= await Todo.findByIdAndDelete(id, req.body);
+        const {id} = req.params;
+        const todo = await Todo.findByIdAndDelete(id);
         if(!todo){
-            return res.status(404).json({message:`cannot find any product with ID ${id}`})
+            return res.status(404).json({message: `cannot find any product with ID ${id}`})
         }
-        res.status(200).json(todo)
+        res.status(200).json(todo);
         
     } catch (error) {
         res.status(500).json({message: error.message})
