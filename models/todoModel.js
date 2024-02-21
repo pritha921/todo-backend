@@ -5,11 +5,6 @@ const todoSchema = mongoose.Schema(
             type: String,
             required: [true,"Please enter a task"]
         },
-        id:{
-            type: Number,
-            required:true
-
-        },
         completed:{
             type: Boolean,
         }
