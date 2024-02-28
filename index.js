@@ -1,10 +1,18 @@
-const express=require('express');
-const mongoose= require('mongoose');  
-const app=express();
-const Todo= require('./models/todoModel')
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const app = express();
+const Todo = require('./models/todoModel');
 
-app.use(express.json())
-app.use(express.urlencoded({extended: false}))
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Use cors middleware
+app.use(cors());
+
+app.use(cors({
+    origin: 'http://127.0.0.1:5500'
+  }));
 
 //routes
 app.get('/',(req, res)=>{
