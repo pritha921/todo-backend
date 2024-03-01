@@ -4,6 +4,9 @@ const cors = require('cors');
 const app = express();
 const Todo = require('./models/todoModel');
 
+const path= require('path');
+const bcrypt=require('bcrypt')
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -96,6 +99,33 @@ app.put('/todo/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+//------login and signup functionality--------------
+
+app.get('/todo/login', (req, res)=>{
+    res.render("login")
+})
+
+app.get('/todo/signup', (req, res)=>{
+    res.render("signup")
+})
+
+//Register User
+app.post("/signup", async(req, res)=>{
+    const data={
+        name: req.body.username,
+        password: req.body.password
+    }
+
+    const userData= await Collection.insertMany([data]);
+    console.log(userData);
+    res.render("todo")
+})
+
+
+
+
+   
 
 mongoose.
 connect('mongodb+srv://prithasen006:Mymongo07@todoapi.cufbbh8.mongodb.net/node-api?retryWrites=true&w=majority')

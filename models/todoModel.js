@@ -8,10 +8,13 @@ const todoSchema = mongoose.Schema(
         completed:{
             type: Boolean,
         }
+        
     },
+   
     {
         timestamps:true,
     }
+
 )
 
 const todo= mongoose.model('todo',todoSchema)
