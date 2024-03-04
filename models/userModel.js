@@ -16,3 +16,8 @@ const userSchema= mongoose.Schema(
     }
 
 )
+
+const auth= mongoose.model('auth',userSchema)
+
+module.exports= auth
+

@@ -3,9 +3,17 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 const Todo = require('./models/todoModel');
-
+const userModel = require('./models/userModel');
+const jwt= require('jsonwebtoken');
 const path= require('path');
 const bcrypt=require('bcrypt')
+const secretKey="secretKey";
+const dbConfig= require('./config/dbconfig');
+const auth= require('./middlewares/auth');
+const errors= require('./middlewares/errors');
+const unless= require('express-unless')
+
+mongoose.Promise= global.Promise
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -16,6 +24,9 @@ app.use(cors());
 app.use(cors({
     origin: 'http://127.0.0.1:5500'
   }));
+
+  app.use("/users", require("./routes/userRoutes"));
+  app.use(errors.errorHandler);
 
 //routes
 app.get('/',(req, res)=>{
@@ -102,33 +113,87 @@ app.put('/todo/:id', async (req, res) => {
 
 //------login and signup functionality--------------
 
-app.get('/todo/login', (req, res)=>{
-    res.render("login")
-})
+// app.get('/todo/login', (req, res)=>{
+//     res.render("login")
+// })
 
-app.get('/todo/signup', (req, res)=>{
-    res.render("signup")
-})
+// app.get('/todo/signup', (req, res)=>{
+//     res.render("signup")
+// })
 
-//Register User
-app.post("/signup", async(req, res)=>{
-    const data={
-        name: req.body.username,
-        password: req.body.password
+// //Register User
+// app.post("/signup", async(req, res)=>{
+//     const data={
+//         name: req.body.username,
+//         password: req.body.password
+//     }
+
+//     const userData= await Collection.insertMany([data]);
+//     console.log(userData);
+//     res.render("todo")
+// })
+
+
+// app.post("/auth/login",(req, res)=>
+//     {
+//         const user={
+//             id:1,
+//             username:"Pritha",
+//             email:"abc@gmail.com"
+//         }
+
+//          jwt.sign({ user }, secretKey, { expiresIn: '300s' }, (err, token) => {
+//             res.json({
+//                token 
+//             })
+//          })
+        
+//     }
+// )
+
+app.post("/auth/login", async (req, res) => {
+    const { userName, password } = req.body;
+
+    try {
+       
+        const user = await userModel.findOne({ userName });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        
+        const validPassword = await bcrypt.compare(password, user.password);
+
+        if (!validPassword) {
+            return res.status(401).json({ message: "Invalid password" });
+        }
+
+       
+        jwt.sign({ user }, secretKey, { expiresIn: '300s' }, (err, token) => {
+            if (err) {
+                return res.status(500).json({ message: "Internal server error" });
+            }
+            res.json({
+                token
+            });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
     }
-
-    const userData= await Collection.insertMany([data]);
-    console.log(userData);
-    res.render("todo")
-})
-
+});
 
 
 
    
 
 mongoose.
-connect('mongodb+srv://prithasen006:Mymongo07@todoapi.cufbbh8.mongodb.net/node-api?retryWrites=true&w=majority')
+connect('mongodb+srv://prithasen006:Mymongo07@todoapi.cufbbh8.mongodb.net/node-api?retryWrites=true&w=majority',
+{
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
 .then(()=>{
     console.log("Connected to MongoDB")
     app.listen(3000, ()=>{
@@ -137,3 +202,17 @@ connect('mongodb+srv://prithasen006:Mymongo07@todoapi.cufbbh8.mongodb.net/node-a
 }).catch(()=>{
     console.log("Error")
 })
+
+auth.authenticateToken.unless=unless;
+app.use(
+    auth.authenticateToken.unless({
+        path:[
+            {
+                url: "users/login", methods: ["POST"]
+            },
+            {
+                url: "users/register", methods: ["POST"]
+            }
+        ]
+    })
+)
