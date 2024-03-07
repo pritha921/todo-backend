@@ -218,7 +218,7 @@ app.get('/todo/:id', auth.authenticateToken, async (req, res) => {
 
 app.post('/todo', auth.authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id; // Get user ID from authenticated user
+    const userId = req.user.id; 
     const todo = await Todo.create({ ...req.body, user: userId });
     res.status(200).json(todo)
   } catch (error) {
@@ -231,7 +231,7 @@ app.post('/todo', auth.authenticateToken, async (req, res) => {
 app.put('/todo/:id', auth.authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id; // Get user ID from authenticated user
+    const userId = req.user.id;
     const todo = await Todo.findByIdAndUpdate({ _id: id, user: userId }, req.body, { new: true });
     if (!todo) {
       return res.status(404).json({ message: `cannot find any product with ID ${id}` })
@@ -247,7 +247,7 @@ app.put('/todo/:id', auth.authenticateToken, async (req, res) => {
 app.delete('/todo/:id', auth.authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id; // Get user ID from authenticated user
+    const userId = req.user.id;
     const todo = await Todo.findOneAndDelete({ _id: id, user: userId });
     if (!todo) {
       return res.status(404).json({ message: `cannot find any product with ID ${id}` })

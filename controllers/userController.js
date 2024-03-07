@@ -34,6 +34,22 @@ exports.login = (req, res, next)=>{
     });
 };
 
-exports.userProfile= (req, res, next)=>{
-    return res.status(200).json({message:"Authorized User!"});
+// exports.userProfile= (req, res, next)=>{
+//     return res.status(200).json({message:"Authorized User!"});
+// };
+
+exports.userProfile = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const user = await userModel.findById(userId, { username: 1, email: 1 });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json({
+            message: "Authorized user",
+            user: user
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
